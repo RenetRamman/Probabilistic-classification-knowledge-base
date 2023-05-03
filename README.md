@@ -1,5 +1,11 @@
 # Probabilistic-classification-knowledge-base
 
+## installation
+
+git lfs clone git@github.com:RenetRamman/Probabilistic-classification-knowledge-base.git ramman2/
+
+## Use
+
 Code used for generating the probabilistic classification knowledge base
 
 In order to generate new probabilistic classification rules, run the programs in the order in which they are listed below.
