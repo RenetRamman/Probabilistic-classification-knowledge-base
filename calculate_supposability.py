@@ -236,7 +236,7 @@ def calc_static(data, apply_data):
 
 
 
-def ajust_confidence(in_file, out_file, confidences, cooccurrences, object_counts, value_counts, write_to_file=False):
+def adjust_supposability(in_file, out_file, confidences, cooccurrences, object_counts, value_counts, write_to_file=False):
     global last, last_confs
 
     # Standardize data
@@ -296,7 +296,7 @@ def ajust_confidence(in_file, out_file, confidences, cooccurrences, object_count
     # 0.6666666666666666
     # 0.1316872427983539
     # 0.1316872427983539
-    def apply_data(data, index, c, co, o, v): return ((data[0][index] * c) + ((data[1][index] * co) * (1 / ( (math.log(data[2][index]) * o ) / ( math.log(data[3][index]) *v ) ) ) ) )
+    # def apply_data(data, index, c, co, o, v): return ((data[0][index] * c) + ((data[1][index] * co) * (1 / ( (math.log(data[2][index]) * o ) / ( math.log(data[3][index]) *v ) ) ) ) )
 
 
     # 0.0 -> 13223
@@ -321,7 +321,7 @@ def ajust_confidence(in_file, out_file, confidences, cooccurrences, object_count
 
     ####### 0.4 -> 0.6688
     # SIMILARITY: 0.9095063342895561
-    # def apply_data(data, index): return ((data[0][index]) + (data[1][index] * (1 / ( (math.log(data[2][index]) * 0.5 ) / ( math.log(data[3][index])  ) ) ) ) )
+    def apply_data(data, index): return ((data[0][index]) + (data[1][index] * (1 / ( (math.log(data[2][index]) * 0.5 ) / ( math.log(data[3][index])  ) ) ) ) )
 
     # 0.0 16319
     # SIMILARITY: 0.8904347680069572
@@ -330,8 +330,8 @@ def ajust_confidence(in_file, out_file, confidences, cooccurrences, object_count
     # def apply_data(data, index): return (data[0][index])
 
 
-    # calc_static(test_set, apply_data)
-    calc_rec(test_set, apply_data)
+    calc_static(test_set, apply_data)
+    # calc_rec(test_set, apply_data)
 
 
     # print("Evaluation:")
@@ -386,7 +386,7 @@ def ajust_confidence(in_file, out_file, confidences, cooccurrences, object_count
 
 objects, values, confidences, cooccurrences, object_counts, value_counts, verification_data = read_data("data.txt")
 
-ajust_confidence("flipped.txt", "flipped_adjusted.txt", confidences, cooccurrences, object_counts, value_counts, True)
+adjust_supposability("flipped.txt", "flipped_adjusted.txt", confidences, cooccurrences, object_counts, value_counts, True)
 
 
 
