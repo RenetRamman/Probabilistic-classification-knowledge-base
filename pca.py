@@ -40,15 +40,21 @@ def pca(filename):
 
     # Calculate eigen vectors, eigen values
     eig_vals, eig_vecs = np.linalg.eig(covariance_matrix)
+    labels = ["supposability", "co-occurrence", "object importance", "value importance"]
 
     # Generate eigen pairs
     eig_pairs = [(np.abs(eig_vals[i]), eig_vecs[:,i]) for i in range(len(eig_vals))]
+    for i in range(len(eig_pairs)):
+        eig_pairs[i] = (eig_pairs[i][0], eig_pairs[i][1], labels[i])
+        print(eig_pairs[i])
 
     # Eigenvalues in order
+    sorted_labels = []
     eig_pairs.sort(key=lambda x: x[0], reverse=True)
     print('Eigenvalues in descending order:')
     for i in eig_pairs:
-        print(i[0])
+        print(i)
+        sorted_labels.append(i[2])
 
 
     # Explained variance
@@ -60,7 +66,7 @@ def pca(filename):
     with plt.style.context('seaborn-whitegrid'):
         plt.figure(figsize=(6, 4))
 
-        plt.bar(range(4), var_exp, alpha=0.5, align='center',
+        plt.bar(sorted_labels, var_exp, alpha=0.5, align='center',
                 label='individual explained variance')
         plt.step(range(4), cum_var_exp, where='mid',
                 label='cumulative explained variance')
@@ -79,19 +85,9 @@ def pca(filename):
     print('Covariance matrix \n%s' %covariance_matrix)
 
 
-    # Projection onto new feature space
-    Y = standardized_data.T.dot(matrix_w).T
-    print(len(Y))
-    print(len(Y[0]))
 
-    with plt.style.context('seaborn-whitegrid'):
-        plt.figure(figsize=(6, 4))
-        plt.scatter(Y[0], Y[1])
-        plt.xlabel('Principal Component 1')
-        plt.ylabel('Principal Component 2')
-        plt.legend(loc='lower center')
-        plt.tight_layout()
-        plt.show()
+
+    plt.show()
 
 
 

@@ -1,13 +1,19 @@
 # Calculate covariance matrix of initial probability, cooccurrence, object count, value count
 
 # Format of data:
-# data[<object>][0] = <object> occurrence count
-# data[<object>][1][<value>]["p"] = probability of <object>|isA|<value>
-# data[<object>][1][<value>]["v"] = <value> occurrenxe count
-# data[<object>][1][<value>]["co"] = <object> and <value> co-occurrenxe count
+# data[<object>][0] = <object> importance
+# data[<object>][1][<value>]["p"] = supposability of <object>|isA|<value>
+# data[<object>][1][<value>]["v"] = <value> importance
+# data[<object>][1][<value>]["co"] = <object> and <value> co-occurrence count
 
 import math
 import re
+import argparse
+
+parser = argparse.ArgumentParser(description="Program used to generate a dataset of object and value importances and co-occurrances from a knowledge base of object|property|value triples and wikimatrixrelatedtop20000 and importantwords.txt", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+parser.add_argument("src", help="file name of the input knowledge base")
+args = parser.parse_args()
 
 def create_dataset(filename):
     # Add probability data
@@ -31,7 +37,7 @@ def create_dataset(filename):
 
 
     # Add cooccurrence data
-    f = open("wikicooccurrence/wikimatrixrelatedtop20000")
+    f = open("wikimatrixrelatedtop20000")
     wordcount = {}
     counter = 0
     for i in f:
@@ -63,7 +69,7 @@ def create_dataset(filename):
 
 
     # Add object and value counts
-    f = open("wikicooccurrence/important_words.txt")
+    f = open("important_words.txt")
 
     total = 0
     for i in f:
@@ -122,11 +128,11 @@ def create_dataset(filename):
 
     # print("COUNTS:::::")
 
-    print("object, value, confidence, cooccurrence, object_count, value_count")
+    print("object, value, supposability, cooccurrence, object_importance, value_importance")
     for i in range(len(probabilities)):
         row = objects[i] + ", " + values[i] + ", " + str(probabilities[i]) + ", " + str(co_occurrence_counts[i]) + ", " + str(object_counts[i]) + ", " + str(value_counts[i])
         print(row)
 
 
 # create_dataset("singularized/flipped/100k_flipped.txt")
-create_dataset("flipped.txt")
+create_dataset(args.src)

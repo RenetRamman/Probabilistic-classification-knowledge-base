@@ -7,6 +7,15 @@ from sklearn.preprocessing import minmax_scale
 import math
 from pattern.text.en import singularize
 from nltk.stem.wordnet import WordNetLemmatizer
+import argparse
+
+parser = argparse.ArgumentParser(description="Program used to generate a dataset of object and value importances and co-occurrances from a knowledge base of object|property|value triples and wikimatrixrelatedtop20000 and importantwords.txt", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+parser.add_argument("src", help="file name of the input knowledge base with probabilistic classification rules")
+parser.add_argument("-d", "--data", help="filename of the dataset containing supposability values, co-occurrence count and object and value importances")
+parser.add_argument("-v", "--verboose", help="print the resulting rules", action="store_true")
+args = parser.parse_args()
+
 
 def def_nr():
     return -1
@@ -236,7 +245,7 @@ def calc_static(data, apply_data):
 
 
 
-def adjust_supposability(in_file, out_file, confidences, cooccurrences, object_counts, value_counts, write_to_file=False):
+def adjust_supposability(in_file, out_file, confidences, cooccurrences, object_counts, value_counts):
     global last, last_confs
 
     # Standardize data
@@ -337,26 +346,26 @@ def adjust_supposability(in_file, out_file, confidences, cooccurrences, object_c
     # print("Evaluation:")
     # print(evaluate(verification_data, verification_data))
 
-    print("SIMILARITY: " + str(last))
-    print(len(last_confs))
-    print(last_confs[:10])
-    print(min(last_confs))
-    print(max(last_confs))
+    if not out_file:
+        print("SIMILARITY: " + str(last))
+        print(len(last_confs))
+        print(last_confs[:10])
+        print(min(last_confs))
+        print(max(last_confs))
 
-    count = 0
-    for number in verification_data:
-        if number != -1:
-            count += 1
-    print(count)
+        count = 0
+        for number in verification_data:
+            if number != -1:
+                count += 1
+        print(count)
     # print(_c)
     # print(_co)
     # print(_o)
     # print(_v)
 
 
-    if write_to_file:
+    if out_file:
         f = open(in_file)
-        g = open(out_file, "w")
 
         index = 0
         for i in f:
@@ -370,12 +379,11 @@ def adjust_supposability(in_file, out_file, confidences, cooccurrences, object_c
                 if object != objects[j]: continue
                 if value != values[j]: continue
                 if conf != confidences[j]: continue
-                g.write(str(last_confs[j]) + ": " + i.split(":")[1] + "\n")
+                print(str(last_confs[j]) + ": " + i.split(":")[1])
 
                 
 
         f.close()
-        g.close()
 
     
 
@@ -384,9 +392,9 @@ def adjust_supposability(in_file, out_file, confidences, cooccurrences, object_c
 
 
 
-objects, values, confidences, cooccurrences, object_counts, value_counts, verification_data = read_data("data.txt")
+objects, values, confidences, cooccurrences, object_counts, value_counts, verification_data = read_data(args.data)
 
-adjust_supposability("flipped.txt", "flipped_adjusted.txt", confidences, cooccurrences, object_counts, value_counts, True)
+adjust_supposability(args.src, args.verboose, confidences, cooccurrences, object_counts, value_counts)
 
 
 

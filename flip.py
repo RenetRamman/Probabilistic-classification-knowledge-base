@@ -1,4 +1,10 @@
 from collections import defaultdict
+import argparse
+
+parser = argparse.ArgumentParser(description="Program used to generate probabilistic classification rules from a knowledge base of object|property|value triples", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+parser.add_argument("src", help="file name of the input knowledge base")
+args = parser.parse_args()
 
 
 def def_value():
@@ -57,4 +63,4 @@ def flip(fileName):
 # flip("singularized/wheels_n_wings.txt")
 
 # flip("singularized/100k.txt")
-flip("singulars.txt")
+flip(args.src)

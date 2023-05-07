@@ -1,5 +1,14 @@
+import argparse
 
-def convertFrom(fileName, keyes = [], whitelist = [], blacklist=[]):
+parser = argparse.ArgumentParser(description="Program used to extract object|property|value triples from knowledge bases", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+parser.add_argument("src", help="file name of the input knowledge base")
+parser.add_argument("-b", "--blacklist", help="blacklisted phrases, rules containing these phrases will be ignored", action="append")
+parser.add_argument("-w", "--whitelist", help="whitelisted phrases, rules containing at least one whitelisted phrase and no blacklisted phrases will be printed", action="append")
+args = parser.parse_args()
+# print(args)
+
+def convertFrom(fileName, whitelist = [], blacklist=[]):
 
     f = open(fileName)
 
@@ -13,15 +22,9 @@ def convertFrom(fileName, keyes = [], whitelist = [], blacklist=[]):
                     if (i.__contains__(k)): blacklisted = True
                     
                 if not blacklisted:
-                    if len(keyes) == 0:
-                        print(i.strip("// ").strip("\n")[:-5])
-                        accepted = True
+                    print(i.strip("// ").strip("\n")[:-5])
+                    accepted = True
 
-                    for key in keyes:
-                        if i.__contains__(key):
-                            print(i.strip("// ").strip("\n")[:-5])
-                            accepted = True
-                            break
                 if accepted:
                     accepted = False
                     break
@@ -32,4 +35,4 @@ def convertFrom(fileName, keyes = [], whitelist = [], blacklist=[]):
 # convertFrom("cnet_50k.js", keyes=[], whitelist=["// "], blacklist=["// class element"])
 # convertFrom("cnet_50k.js", keyes=["vehicle", "hasProperty"], whitelist=["// ", "/"], blacklist=["// class element"])
 # convertFrom("cnet_50k.js", keyes=[], whitelist=["// "], blacklist=["// class element"])
-convertFrom("quasi_50k.js", keyes=[], whitelist=["// "], blacklist=["// class element"])
+convertFrom(args.src, whitelist=args.whitelist, blacklist=args.blacklist)

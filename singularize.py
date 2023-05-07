@@ -1,11 +1,18 @@
 from pattern.text.en import singularize
 from nltk.stem.porter import *
 from nltk.stem.wordnet import WordNetLemmatizer
+import argparse
+
+parser = argparse.ArgumentParser(description="Program used to singularize the rules of multiple files at once", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+parser.add_argument("src", help="file names of the input knowledge bases", nargs="*")
+args = parser.parse_args()
+# print(args)
 
 
 def singularize_object(files):
 
-    stemmer = PorterStemmer()
+    # stemmer = PorterStemmer()
     
     for filename in files:
         f = open(filename)
@@ -28,4 +35,4 @@ def singularize_object(files):
 # singularize_object(["converted/50k.txt", "converted/q50k.txt"])
 # singularize_object("converted/vehicles.txt")
 # singularize_object("converted/wheels_n_wings.txt")
-singularize_object(["rules.txt", "rules2.txt"])
+singularize_object(args.src)

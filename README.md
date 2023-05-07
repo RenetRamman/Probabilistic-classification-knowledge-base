@@ -1,60 +1,99 @@
 # Probabilistic-classification-knowledge-base
 
-## installation
+This repository contains the code and datasets used for the thesis **Creating probabilistic classification rules from existing knowledge bases**. The probabilistic classification knowledge base assessed in the thesis is available in the file **flipped_adjustedd.txt**
 
-git lfs clone git@github.com:RenetRamman/Probabilistic-classification-knowledge-base.git ramman2/
+The rules within this knowledge base contain probabilistic classification rules in the following form.
 
-## Use
+    0.0:  X|property|value => X|isA|object
 
-Code used for generating the probabilistic classification knowledge base
+The number preceeding the rules is the supposability value used for comparing the plausibilities of similar rules.
 
-In order to generate new probabilistic classification rules, run the programs in the order in which they are listed below.
+# Clone code and data, using git Large File Storage (lfs)
 
-## 1. Gathering data
+**Install git lfs and use the following command to clone the repository.**
 
-In order to extract rules from another knowledge base, run the *convertFrom* function within the **convert.py** script.
-This function takes in 4 arguments.
+    git lfs clone git@github.com:RenetRamman/Probabilistic-classification-knowledge-base.git ramman/
+
+**Move to the cloned directory.**
+
+    cd ramman
+ 
+
+**install required packages, if not already installed**
+
+libmysqlclient-dev is a dependency for pattern
+
+    pip3 install numpy
+    sudo apt-get install libmysqlclient-dev
+    pip3 install pattern 
+
+
+# Use
+
+This repository contains all of the datasets and scripts required to create the rules that were assessed within the thesis. The **flipped_adjusted.txt** knowledge base of probabilistic classification rules can be created from the start by executing the fllowing commands within the cloned repository in the order in which they are listed below.
+
+    python ./convert.py cnet_50k.js -b "// class element" --whitelist "// " > rules.txt
+    python ./convert.py quasi_50k.js -b "// class element" --whitelist "// " > rules2.txt
+    python ./singularize.py rules.txt rules2.txt > singulars.txt
+    python ./flip.py singulars.txt > flipped.txt
+    python ./flipped_to_dataset.py flipped.txt > data.txt
+    python ./calculate_supposability.py flipped.txt -d data.txt -v > flipped_adjusted.txt
+
+
+
+## Short explanation of the code
+### 1. Gathering data
+
+In order to extract rules from another knowledge base, **convert.py** script.
+This function takes in 3 arguments.
 1. Name of the knowledge base file, from which suitable rules will be extracted
-2. *keyes*= list of keyewords, used to extract rules related to scelected topics (leave this list empty, to extract all suitable rules)
-3. *whitelist*= list of whitelisted strings used for detecting suitable rules, rules not containing a string from this list are excluded from further processing
-4. *blackilst*= any rule which contains a string in this list will be excluded from the result
+2. *whitelist*= list of whitelisted strings used for detecting suitable rules, rules not containing a string from this list are excluded from further processing
+3. *blackilst*= any rule which contains a string in this list will be excluded from the result
 
 Change the values of these arguments in order to extract the rules you find useful.
-Once you are satisfied with the results of this step, pipe the result to a text file, using the following command *convert.py > rules.txt*
+Once you are satisfied with the results of this step, pipe the result to a text file, using the following command
 
-## 2. Singularizing and combining data
+    python ./convert.py cnet_50k.js -b "// class element" --whitelist "// " > rules.txt
+    python ./convert.py quasi_50k.js -b "// class element" --whitelist "// " > rules2.txt
 
-In order to increase the plausibility of the confidences calculated in later steps, run the *singularize_object* function within the **singularize.py** script.
-The input of this function is a list of file names. add the names of the files created in the previous step into this list and run the code in order to lemmatize and singularize the *object* and *value* words within the rules extracted in the previous step. Similarly to the previous step, pipe the result into a new file like so: *singularize.py > singulars.txt*
+### 2. Singularizing and combining data
 
-## 3. Fliping the singularized rules
+In order to increase the plausibility of the supposability values calculated in later steps, run the **singularize.py** script.
+The input of this function is a list of file names. add the names of the files created in the previous step into this list and run the code in order to lemmatize and singularize the *object* and *value* words within the rules extracted in the previous step. Similarly to the previous step, pipe the result into a new file
 
-In order to convert the singularized rules into probabilistic classification rules, run the function *flip* within the **flip.py** script.
-as its input it takes the name of the file which contains the singularized rules. Similarly to previous steps again, provide the function with the correct arguments and pipe the results into a new file like so: *flip.py > flipped.txt*
+    python ./singularize.py rules.txt rules2.txt > singulars.txt
 
-## 4. Extract co-occurrence and word importance data
+### 3. Fliping the singularized rules
 
-In this step a dataset containing the confidences created in the previous step, as well as co-occurrence data from Wikipedia and word importances are created.
-This data will later be used for pca and calculating improved confidences.
+In order to convert the singularized rules into probabilistic classification rules, run the **flip.py** script.
+as its input it takes the name of the file which contains the singularized rules. Similarly to previous steps again, provide the function with the correct arguments and pipe the results into a new file
 
-Simply run the *create_dataset* function within the **flipped_to_dataset.py** script with the name of the file created in the previous step. pipe the result into a new file, *flipped_to_dataset.py > data.txt*
+    python ./flip.py singulars.txt > flipped.txt
 
-## 5. PCA
+### 4. Extract co-occurrence and word importance data
+
+In this step a dataset containing the supposability values created in the previous step, as well as co-occurrence data from wikimatrixrelatedtop20000 and word importances from importantwords.txt is created.
+This data will later be used for pincipal component analysis (pca) and for calculating improved supposability values.
+
+Simply run the **flipped_to_dataset.py** script with the name of the file created in the previous step. pipe the result into a new file, 
+
+    python ./flipped_to_dataset.py flipped.txt > data.txt
+
+### 5. PCA
 
 **This step is optional**
 
-In this step principal component analysis is performed, run the *pca* function within the **pca.py** script.
+In this step principal component analysis is performed.
 
-## 6. Improving confidences
 
-Within the **formula_validation.py** script, change the arguments of the *read_data* function to reflect the name of the file created in the fourth step.
+### 6. Improving confidences
 
-Then change the first argument of the *ajust_confidence* function to the file name of the flipped rules, created in the third step, and the second argument of this function to the file name of the new knowledge base that will be created as a result of running this function.
+Calculate more plausible supposability values for the probabilistic classification rules created in step 3 by running the **calculate_supposability.py** script.
 
 The *read_data* function gathers the necessary data for calculating new confidences.
 The *ajust_confidence* function uses the gathered data to calculate new confidences, evaluates the result and writes the rules with new confidences to a file.
 
-Within *ajust_confidence*, define a new function, *apply_data* this function defines the formula used to calculate the new confidences.
+Within *ajust_confidence*, by modifying the function, *apply_data* the formula used for calculating supposability values can be changed.
 
 There are two methods for applying formulas to the data, so two ways to define the *apply_data* function
 
@@ -63,6 +102,28 @@ There are two methods for applying formulas to the data, so two ways to define t
 
 The first method can be applied as follows: *calc_rec(test_set, apply_data)*. The *calc_rec* function recursively modifies the variables *c, co, o, v* to apply multiplyers to the data.
 
-The second method can be applied as follows: *calc_static(test_set, apply_data)* here the weights can be applied manually, and the formula is applied only once.
+The second method can be applied as follows: *calc_static(test_set, apply_data)* here the weights can be applied manually, and the formula is applied only once, thus reducing the programs excecution time.
 
-In order to speed up processing time, the *write_to_file* argument of the *ajust_confidences* function can be set to False. This will prevent the program from writing the rules to a file, reducing the time required to run the program.
+The **-verboose** argument. If this argument is provided when running the **calculate_supposability.py** script, the calculated supposability values are added to the probabilistic classification rules and printed ot the output. If this argument is not provided, only the ISC similarity to the validation data from double_words.csv dataset will be printed to reduce the programs excecution time.
+
+Run the following command
+
+    python ./calculate_supposability.py flipped.txt -d data.txt -v > flipped_adjusted.txt
+
+## References
+
+**double_words.csv**
+
+Download link: https://wordnorms.com/
+
+**cnet_50k.js**
+
+Download link: http://turing.cs.ttu.ee/~Tanel.Tammet/cnet_50k.js
+
+**quasi_50k.js**
+
+Download link: http://turing.cs.ttu.ee/~Tanel.Tammet/quasi_50k.js
+
+**wikimatrixrelatedtop20000 and importantwords.txt**
+
+Download link:    http://turing.cs.ttu.ee/~Tanel.Tammet/wikicooccurrence.tar.gz
